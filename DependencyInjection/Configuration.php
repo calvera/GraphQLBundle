@@ -100,6 +100,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('exceptions')
                             ->addDefaultsIfNotSet()
                             ->children()
+                                ->scalarNode('formatter')->defaultNull()->end()
                                 ->arrayNode('warnings')
                                     ->treatNullLike([])
                                     ->prototype('scalar')->end()

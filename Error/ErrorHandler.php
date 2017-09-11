@@ -24,6 +24,11 @@ class ErrorHandler
     const DEFAULT_USER_WARNING_CLASS = UserWarning::class;
     const DEFAULT_USER_ERROR_CLASS = UserError::class;
 
+    /**
+     * @var string
+     */
+    private $errorFormatterClass;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -39,7 +44,7 @@ class ErrorHandler
     /** @var string */
     private $userErrorClass = self::DEFAULT_USER_ERROR_CLASS;
 
-    public function __construct($internalErrorMessage = null, LoggerInterface $logger = null, array $exceptionMap = [])
+    public function __construct($internalErrorMessage = null, LoggerInterface $logger = null, array $exceptionMap = [], string $errorFormatterClass = null)
     {
         $this->logger = (null === $logger) ? new NullLogger() : $logger;
         if (empty($internalErrorMessage)) {
@@ -47,6 +52,7 @@ class ErrorHandler
         }
         $this->internalErrorMessage = $internalErrorMessage;
         $this->exceptionMap = $exceptionMap;
+        $this->errorFormatterClass = $errorFormatterClass ?: GraphQLError::class;
     }
 
     public function setUserWarningClass($userWarningClass)
@@ -62,6 +68,15 @@ class ErrorHandler
 
         return $this;
     }
+
+    /**
+     * @param string $errorFormatterClass
+     */
+    public function setErrorFormatterClass(string $errorFormatterClass)
+    {
+        $this->errorFormatterClass = $errorFormatterClass;
+    }
+
 
     /**
      * @param GraphQLError[] $errors
@@ -157,11 +172,11 @@ class ErrorHandler
 
     public function handleErrors(ExecutionResult $executionResult, $throwRawException = false)
     {
-        $executionResult->setErrorFormatter(sprintf('\%s::formatError', GraphQLError::class));
+        $executionResult->setErrorFormatter([$this->errorFormatterClass, 'formatError']);
         $exceptions = $this->treatExceptions($executionResult->errors, $throwRawException);
         $executionResult->errors = $exceptions['errors'];
         if (!empty($exceptions['extensions']['warnings'])) {
-            $executionResult->extensions['warnings'] = array_map([GraphQLError::class, 'formatError'], $exceptions['extensions']['warnings']);
+            $executionResult->extensions['warnings'] = array_map([$this->errorFormatterClass, 'formatError'], $exceptions['extensions']['warnings']);
         }
     }
 

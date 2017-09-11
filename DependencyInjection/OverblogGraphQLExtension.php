@@ -154,7 +154,12 @@ class OverblogGraphQLExtension extends Extension implements PrependExtensionInte
                 ->addMethodCall('setUserWarningClass', [$config['definitions']['exceptions']['types']['warnings']])
                 ->addMethodCall('setUserErrorClass', [$config['definitions']['exceptions']['types']['errors']])
             ;
+            if (isset($config['definitions']['exceptions']['formatter'])) {
+                $errorHandlerDefinition
+                    ->addMethodCall('setErrorFormatterClass', [$config['definitions']['exceptions']['formatter']]);
+            }
         }
+
     }
 
     private function setSchemaBuilderArguments(array $config, ContainerBuilder $container)
@@ -208,8 +213,10 @@ class OverblogGraphQLExtension extends Extension implements PrependExtensionInte
                 continue;
             }
 
-            foreach ($exceptionList as $exception) {
-                $exceptionMap[$exception] = $typeMap[$type];
+            if (is_array($exceptionList)) {
+                foreach ($exceptionList as $exception) {
+                    $exceptionMap[$exception] = $typeMap[$type];
+                }
             }
         }
 
