@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the OverblogGraphQLBundle package.
- *
- * (c) Overblog <http://github.com/overblog/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Overblog\GraphQLBundle\Request;
 
 use GraphQL\Executor\ExecutionResult;
@@ -29,14 +20,10 @@ class Executor
 {
     const PROMISE_ADAPTER_SERVICE_ID = 'overblog_graphql.promise_adapter';
 
-    /**
-     * @var Schema[]
-     */
+    /** @var Schema[] */
     private $schemas;
 
-    /**
-     * @var EventDispatcherInterface|null
-     */
+    /** @var EventDispatcherInterface|null */
     private $dispatcher;
 
     /** @var bool */
@@ -48,19 +35,13 @@ class Executor
     /** @var bool */
     private $hasDebugInfo;
 
-    /**
-     * @var ExecutorInterface
-     */
+    /** @var ExecutorInterface */
     private $executor;
 
-    /**
-     * @var PromiseAdapter
-     */
+    /** @var PromiseAdapter */
     private $promiseAdapter;
 
-    /**
-     * @var callable|null
-     */
+    /** @var callable|null */
     private $defaultFieldResolver;
 
     public function __construct(

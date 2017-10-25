@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the OverblogGraphQLBundle package.
- *
- * (c) Overblog <http://github.com/overblog/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Overblog\GraphQLBundle\Tests\Functional\App;
 
 use Overblog\GraphQLBundle\OverblogGraphQLBundle;
@@ -43,12 +34,12 @@ final class TestKernel extends Kernel
 
     public function getCacheDir()
     {
-        return sys_get_temp_dir().'/OverblogGraphQLBundle/'.Kernel::VERSION.'/'.$this->testCase.'/cache/'.$this->environment;
+        return $this->basePath().'cache/'.$this->environment;
     }
 
     public function getLogDir()
     {
-        return sys_get_temp_dir().'/OverblogGraphQLBundle/'.Kernel::VERSION.'/'.$this->testCase.'/logs';
+        return $this->basePath().'logs';
     }
 
     public function getRootDir()
@@ -71,5 +62,10 @@ final class TestKernel extends Kernel
         } else {
             $loader->load(__DIR__.'/config/config.yml');
         }
+    }
+
+    private function basePath()
+    {
+        return sys_get_temp_dir().'/OverblogGraphQLBundle/'.Kernel::VERSION.'/'.($this->testCase ? $this->testCase.'/' : '');
     }
 }

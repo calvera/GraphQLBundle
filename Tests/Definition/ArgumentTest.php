@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the OverblogGraphQLBundle package.
- *
- * (c) Overblog <http://github.com/overblog/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Overblog\GraphQLBundle\Tests\Definition;
 
 use Overblog\GraphQLBundle\Definition\Argument;
@@ -16,14 +7,10 @@ use PHPUnit\Framework\TestCase;
 
 class ArgumentTest extends TestCase
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $rawArgs;
 
-    /**
-     * @var Argument
-     */
+    /** @var Argument */
     private $argument;
 
     public function setUp()

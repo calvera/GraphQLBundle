@@ -1,26 +1,39 @@
 <?php
 
-/*
- * This file is part of the OverblogGraphQLBundle package.
- *
- * (c) Overblog <http://github.com/overblog/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Overblog\GraphQLBundle\Command;
 
 use GraphQL\Type\Introspection;
 use GraphQL\Utils\SchemaPrinter;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Overblog\GraphQLBundle\Request\Executor as RequestExecutor;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class GraphQLDumpSchemaCommand extends ContainerAwareCommand
+class GraphQLDumpSchemaCommand extends Command
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var string */
+    private $relayVersion;
+
+    /** @var string */
+    private $baseExportPath;
+
+    public function __construct(
+        ContainerInterface $container,
+        $relayVersion,
+        $baseExportPath
+    ) {
+        parent::__construct();
+        $this->container = $container;
+        $this->relayVersion = $relayVersion;
+        $this->baseExportPath = $baseExportPath;
+    }
+
     protected function configure()
     {
         $this
@@ -70,11 +83,10 @@ class GraphQLDumpSchemaCommand extends ContainerAwareCommand
 
     private function createFile(InputInterface $input)
     {
-        $container = $this->getContainer();
         $format = strtolower($input->getOption('format'));
         $schemaName = $input->getOption('schema');
-        $requestExecutor = $container->get('overblog_graphql.request_executor');
-        $file = $input->getOption('file') ?: $container->getParameter('kernel.root_dir').sprintf('/../var/schema%s.%s', $schemaName ? '.'.$schemaName : '', $format);
+
+        $file = $input->getOption('file') ?: $this->baseExportPath.sprintf('/../var/schema%s.%s', $schemaName ? '.'.$schemaName : '', $format);
 
         switch ($format) {
             case 'json':
@@ -86,7 +98,7 @@ class GraphQLDumpSchemaCommand extends ContainerAwareCommand
 
                 $modern = $this->useModernJsonFormat($input);
 
-                $result = $requestExecutor
+                $result = $this->getRequestExecutor()
                     ->execute($request, [], $schemaName)
                     ->toArray();
 
@@ -94,7 +106,7 @@ class GraphQLDumpSchemaCommand extends ContainerAwareCommand
                 break;
 
             case 'graphql':
-                $content = SchemaPrinter::doPrint($requestExecutor->getSchema($schemaName));
+                $content = SchemaPrinter::doPrint($this->getRequestExecutor()->getSchema($schemaName));
                 break;
 
             default:
@@ -116,9 +128,17 @@ class GraphQLDumpSchemaCommand extends ContainerAwareCommand
 
         // none chosen so fallback on default behavior
         if (!$modern && !$classic) {
-            return 'modern' === $this->getContainer()->getParameter('overblog_graphql.versions.relay');
+            return 'modern' === $this->relayVersion;
         }
 
         return $modern;
+    }
+
+    /**
+     * @return RequestExecutor
+     */
+    private function getRequestExecutor()
+    {
+        return $this->container->get('overblog_graphql.request_executor');
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the OverblogGraphQLBundle package.
- *
- * (c) Overblog <http://github.com/overblog/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Overblog\GraphQLBundle\DependencyInjection;
 
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -20,8 +11,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    /** bool */
     private $debug;
 
+    /** null|string */
     private $cacheDir;
 
     /**
@@ -110,7 +103,7 @@ class Configuration implements ConfigurationInterface
                                         ->addDefaultsIfNotSet()
                                         ->beforeNormalization()
                                             ->ifTrue(function ($v) {
-                                                return isset($v['type']) && $v['type'] === 'yml';
+                                                return isset($v['type']) && 'yml' === $v['type'];
                                             })
                                             ->then(function ($v) {
                                                 $v['type'] = 'yaml';
