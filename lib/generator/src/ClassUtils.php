@@ -39,7 +39,7 @@ abstract class ClassUtils
             };
         }
 
-        $codeParsed = \preg_replace_callback('@((?:\\\\{1,2}\w+|\w+\\\\{1,2})(?:\w+\\\\{0,2})+)@', $callback, $code);
+        $codeParsed = \preg_replace_callback('@((?:\\\\{1,2}\w+|\w+\\\\{1,2})(?:\w+\\\\{0,2})+)@', $callback, $code ?? '');
 
         return $codeParsed;
     }
